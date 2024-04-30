@@ -1,22 +1,20 @@
-name: HandleStaleDiscussions
-on:
-  schedule:
-    - cron: '0 */4 * * *'
-  discussion_comment:
-    types: [created]
-
 jobs:
   handle-stale-discussions:
     if: github.repository == 'aws/aws-sdk-java-v2'
     name: Handle stale discussions
-    runs-on: ubuntu-latest
     permissions:
       discussions: write
+    runs-on: self-hosted
     steps:
-      - name: Stale discussions action
-        uses: aws-github-ops/handle-stale-discussions@v1
-        with:
-          close-stale-as-answered: false
-          close-answered-discussion: false
-        env:
-          GITHUB_TOKEN:  ${{secrets.GITHUB_TOKEN}}
+    - continue-on-error: true
+      env:
+        GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+      name: Stale discussions action
+      uses: aws-github-ops/handle-stale-discussions@v1
+      with:
+        close-answered-discussion: false
+        close-stale-as-answered: false
+name: HandleStaleDiscussions
+on:
+  repository_dispatch:
+    types: trigger-ga___handle-stale-discussions.yml
